@@ -1,5 +1,7 @@
+import os
 import streamlit as st
 from services.auth_service import authenticate_user
+from config.database import get_database_engine_name
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(
@@ -9,9 +11,11 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Load Custom CSS
-with open('assets/style.css') as f:
-    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+# Load Custom CSS safely
+css_path = os.path.join(os.path.dirname(__file__), 'assets', 'style.css')
+if os.path.exists(css_path):
+    with open(css_path, encoding='utf-8') as f:
+        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 # --- SESSION STATE INITIALIZATION ---
 if 'user' not in st.session_state:
@@ -52,6 +56,7 @@ if st.session_state.user is None:
             * Faculty: `faculty1` / `Faculty@123`
             * Student: `student1` / `Student@123`
             """)
+            st.caption(f"🟢 Database: **{get_database_engine_name()}**")
         st.markdown("</div>", unsafe_allow_html=True)
 
 else:
@@ -62,6 +67,7 @@ else:
     with st.sidebar:
         st.write(f"### 👤 {name}")
         st.caption(f"Role: **{role}**")
+        st.caption(f"🟢 DB: **{get_database_engine_name()}**")
         st.button("Logout", on_click=logout, use_container_width=True)
         st.divider()
         st.write("### Navigation")
